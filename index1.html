@@ -1,84 +1,476 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>โปรสล็อตสมาชิกใหม่ – ฝาก 100 รับ 300</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- ปรับฟอนต์ให้ดูดีหน่อย -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User Risk Detector (MVP) — Dashboard</title>
   <style>
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #111;
-      color: #fff;
+    :root{
+      --bg:#0b1220; --card:#0f1a33; --bd:#22304e; --muted:#a9b8dd; --chip:#0b1220;
+      --ok:#3ddc97; --warn:#ffd166; --bad:#ff6b6b;
     }
-    .container {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 20px;
-      text-align: center;
+    body{font-family:system-ui,Segoe UI,Tahoma,sans-serif;margin:0;background:var(--bg);color:#e8eefc}
+    header{padding:18px 18px 10px;border-bottom:1px solid var(--bd);background:var(--card);position:sticky;top:0;z-index:5}
+    h1{margin:0;font-size:18px}
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
+    .grid{display:grid;grid-template-columns:1fr;gap:12px}
+    @media(min-width:980px){.grid{grid-template-columns:1.1fr .9fr}}
+    .card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px}
+    .card h2{margin:0 0 10px;font-size:15px}
+    .row{display:grid;grid-template-columns:1fr 190px;gap:10px;align-items:center;margin:8px 0}
+    .row small{color:var(--muted)}
+    input,select,textarea{
+      width:100%;padding:10px;border-radius:10px;border:1px solid #2a3a5f;background:var(--chip);color:#e8eefc
     }
-    .card {
-      background: #1c1c1c;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.4);
-    }
-    h1 {
-      font-size: 24px;
-      margin-bottom: 10px;
-      color: #ffd54f;
-    }
-    h2 {
-      font-size: 18px;
-      margin-bottom: 15px;
-      color: #fff;
-    }
-    ul {
-      text-align: left;
-      margin: 10px 0 20px;
-      padding-left: 20px;
-      font-size: 14px;
-    }
-    .btn {
-      display: inline-block;
-      padding: 12px 20px;
-      border-radius: 999px;
-      text-decoration: none;
-      font-weight: bold;
-      background: #ff9800;
-      color: #111;
-      margin-top: 10px;
-    }
-    .note {
-      font-size: 12px;
-      color: #bbb;
-      margin-top: 10px;
-    }
+    textarea{min-height:60px;resize:vertical}
+    .sec{margin-top:10px;padding-top:10px;border-top:1px dashed var(--bd)}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #2a3a5f;background:var(--chip)}
+    .ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    button{padding:10px 12px;border-radius:10px;border:1px solid #2a3a5f;background:#122145;color:#e8eefc;cursor:pointer}
+    button:hover{filter:brightness(1.08)}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{border-bottom:1px solid var(--bd);padding:10px;text-align:left;white-space:nowrap}
+    th{color:var(--muted);font-weight:600}
+    .right{text-align:right}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+    .note{color:var(--muted);font-size:12px;margin-top:8px}
+    .tag{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid #2a3a5f;background:var(--chip);margin-right:6px;color:var(--muted)}
+    .kpi{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+    .kpi .pill b{margin-left:6px}
   </style>
 </head>
 <body>
-  <div class="container">
+<header>
+  <h1>User Risk Detector (MVP) — แดชบอร์ดจับยูสเสี่ยง</h1>
+  <div style="margin-top:8px;color:var(--muted);font-size:13px">
+    กรอก/อัปโหลด CSV → ระบบคำนวณ Risk Score → แบ่งสี + เตือน
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+    <!-- INPUT -->
     <div class="card">
-      <h1>🔥 โปรพิเศษวันนี้เท่านั้น</h1>
-      <h2>ฝาก 100 รับ 300 เล่นได้เฉพาะสล็อต</h2>
+      <h2>INPUT (ทดลองใช้งานเร็ว)</h2>
 
-      <ul>
-        <li>ทำเทิร์น 6 เท่า ถอนได้สูงสุด 5 เท่า</li>
-        <li>ไม่ต้องทำกิจกรรม ไม่ต้องแชร์</li>
-        <li>1 ยูสรับได้ 1 ครั้ง (สมาชิกใหม่เท่านั้น)</li>
-      </ul>
+      <div class="row">
+        <div><b>User ID</b><br><small>เช่น ztip10123</small></div>
+        <input id="userId" placeholder="User ID">
+      </div>
 
-      <a class="btn" href="https://YOUR-LINE-OR-MAIN-LINK.com" target="_blank">
-        กดรับโปร / แอดไลน์
-      </a>
+      <div class="row">
+        <div><b>เวลา ฝาก → ถอน (นาที)</b><br><small>ถ้าเร็วผิดปกติจะเสี่ยง</small></div>
+        <input id="depToWdMin" type="number" step="1" value="60">
+      </div>
 
-      <p class="note">
-        *โปรมีจำนวนจำกัด ขอสงวนสิทธิ์เปลี่ยนแปลงโดยไม่แจ้งล่วงหน้า
-      </p>
+      <div class="row">
+        <div><b>ฝากรวม (บาท)</b></div>
+        <input id="deposit" type="number" step="1" value="1000">
+      </div>
+
+      <div class="row">
+        <div><b>ถอนรวม (บาท)</b></div>
+        <input id="withdraw" type="number" step="1" value="800">
+      </div>
+
+      <div class="row">
+        <div><b>ยอดเล่นรวม (Turnover)</b><br><small>ยอดเดิมพัน/ยอดเล่นทั้งหมด</small></div>
+        <input id="turnover" type="number" step="1" value="5000">
+      </div>
+
+      <div class="row">
+        <div><b>Expected Loss Rate</b><br><small>สล็อตโดยเฉลี่ย 4–10% (ใส่เป็นทศนิยม)</small></div>
+        <input id="lossRate" type="number" step="0.01" value="0.08">
+      </div>
+
+      <div class="row">
+        <div><b>% ยอดเล่นใน “เกมเสี่ยง/RTPสูง”</b><br><small>0–100</small></div>
+        <input id="highRTPPct" type="number" step="1" value="20">
+      </div>
+
+      <div class="row">
+        <div><b>ประเภทหลัก</b></div>
+        <select id="primaryType">
+          <option value="สล็อต">สล็อต</option>
+          <option value="กีฬา">กีฬา</option>
+          <option value="หวย">หวย</option>
+        </select>
+      </div>
+
+      <div class="sec">
+        <h2 style="margin:0 0 8px">นำเข้าข้อมูลหลายยูส (CSV)</h2>
+        <div class="note">
+          รูปแบบคอลัมน์: <span class="mono">userId,depToWdMin,deposit,withdraw,turnover,lossRate,highRTPPct,primaryType</span>
+        </div>
+        <div class="btns" style="margin-top:8px">
+          <input id="csvFile" type="file" accept=".csv,text/csv" />
+          <button id="downloadSampleBtn">ดาวน์โหลด Sample CSV</button>
+        </div>
+        <div class="note">
+          * ข้อมูลที่เพิ่มเข้าระบบเก็บไว้ในเครื่อง (LocalStorage) เท่านั้น
+        </div>
+      </div>
+
+      <div class="btns">
+        <button id="addBtn">เพิ่ม/อัปเดตยูส</button>
+        <button id="exportBtn">Export CSV (ผลลัพธ์)</button>
+        <button id="clearBtn">ล้างข้อมูลทั้งหมด</button>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="card">
+      <h2>RESULT (ของยูสที่กำลังกรอก)</h2>
+
+      <div class="kpi">
+        <span class="pill">Expected Loss <b id="kExpLoss">0</b></span>
+        <span class="pill">Net (ถอน-ฝาก) <b id="kNet">0</b></span>
+        <span class="pill">Risk Score <b id="kScore">0</b></span>
+        <span class="pill">Level <b id="kLevel">-</b></span>
+      </div>
+
+      <div class="sec">
+        <h2 style="margin:0 0 8px">กฎที่ใช้ให้คะแนน (MVP)</h2>
+        <div id="rulesBox"></div>
+        <div class="note">
+          * นี่เป็นกฎเบื้องต้น (Rule-based) เพื่อทดลองจับสัญญาณก่อน — ปรับแต่งให้เข้ากับเว็บจริงได้
+        </div>
+      </div>
+
+      <div class="sec">
+        <h2 style="margin:0 0 8px">ค่า Threshold (ปรับได้ในโค้ด)</h2>
+        <div>
+          <span class="tag">ฝาก→ถอน &lt; 30 นาที = +2</span>
+          <span class="tag">ถอน &gt; ฝาก + ExpectedLoss = +2</span>
+          <span class="tag">%เกมเสี่ยง ≥ 80% = +1</span>
+          <span class="tag">Turnover ต่ำแต่ถอนสูง (ROI) = +2</span>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- TABLE -->
+  <div class="card" style="margin-top:12px">
+    <h2>ตารางยูสทั้งหมด</h2>
+    <div style="overflow:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Type</th>
+            <th class="right">ฝาก</th>
+            <th class="right">ถอน</th>
+            <th class="right">Turnover</th>
+            <th class="right">ExpLoss</th>
+            <th class="right">Net</th>
+            <th class="right">%HighRTP</th>
+            <th class="right">ฝาก→ถอน(นาที)</th>
+            <th class="right">Score</th>
+            <th>Level</th>
+            <th>Flags</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="note">
+      Tip: คลิกแถวเพื่อโหลดกลับไปแก้ไขข้อมูลของยูสนั้น
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== Helpers =====
+  const $ = (id)=>document.getElementById(id);
+  const fmt = (n)=> (isFinite(n)? new Intl.NumberFormat('th-TH',{maximumFractionDigits:2}).format(n): '0');
+  const nval = (id)=> parseFloat($(id).value || "0") || 0;
+  const sval = (id)=> ($(id).value || "").trim();
+
+  const STORAGE_KEY = "user_risk_detector_mvp_v1";
+
+  function loadDB(){
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
+    catch { return {}; }
+  }
+  function saveDB(db){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+  }
+
+  // ===== Risk rules (MVP) =====
+  const TH = {
+    fastWithdrawMin: 30,   // dep->wd < 30 min
+    highRtpPct: 80,        // >=80%
+    roiHigh: 0.20,         // ROI > 20% with low turnover ratio
+    lowTurnoverRatio: 2.0  // turnover/deposit < 2
+  };
+
+  function computeMetrics(u){
+    const expLoss = u.turnover * u.lossRate;               // Expected loss from play
+    const net = u.withdraw - u.deposit;                    // positive means user took more out than put in
+    const roi = (u.deposit>0) ? (net / u.deposit) : 0;     // ROI vs deposit
+    const tRatio = (u.deposit>0) ? (u.turnover / u.deposit) : 0; // turnover intensity
+    return {expLoss, net, roi, tRatio};
+  }
+
+  function riskScore(u){
+    const {expLoss, net, roi, tRatio} = computeMetrics(u);
+    let score = 0;
+    const flags = [];
+
+    // Rule 1: fast withdraw
+    if(u.depToWdMin > 0 && u.depToWdMin < TH.fastWithdrawMin){
+      score += 2; flags.push("ฝาก→ถอนเร็ว");
+    }
+
+    // Rule 2: withdraw exceeds deposit + expected loss cushion
+    // i.e., user is ahead beyond expectation
+    if(u.withdraw > (u.deposit + expLoss)){
+      score += 2; flags.push("ถอนสูงเกินคาด");
+    }
+
+    // Rule 3: high-RTP games concentration
+    if(u.highRTPPct >= TH.highRtpPct){
+      score += 1; flags.push("เล่นเกมเสี่ยงหนัก");
+    }
+
+    // Rule 4: low turnover but high ROI (potential exploit/arbing)
+    if(tRatio > 0 && tRatio < TH.lowTurnoverRatio && roi > TH.roiHigh){
+      score += 2; flags.push("ROIสูงแต่เทิร์นน้อย");
+    }
+
+    const level = (score >= 5) ? "🔴 เสี่ยงสูง" : (score >= 3) ? "🟡 เฝ้าระวัง" : "🟢 ปกติ";
+    return {score, level, flags, expLoss, net, roi, tRatio};
+  }
+
+  // ===== UI compute for current inputs =====
+  function readCurrent(){
+    return {
+      userId: sval("userId") || "unknown",
+      depToWdMin: nval("depToWdMin"),
+      deposit: nval("deposit"),
+      withdraw: nval("withdraw"),
+      turnover: nval("turnover"),
+      lossRate: nval("lossRate"),
+      highRTPPct: nval("highRTPPct"),
+      primaryType: $("primaryType").value
+    };
+  }
+
+  function renderCurrent(){
+    const u = readCurrent();
+    const r = riskScore(u);
+
+    $("kExpLoss").textContent = fmt(r.expLoss);
+    $("kNet").textContent = fmt(r.net);
+    $("kScore").textContent = r.score;
+    $("kLevel").textContent = r.level;
+    $("kLevel").className = (r.level.includes("ปกติ")) ? "ok" : (r.level.includes("เฝ้าระวัง")) ? "warn" : "bad";
+
+    const lines = [];
+    lines.push(`• Rule1 ฝาก→ถอน < ${TH.fastWithdrawMin} นาที: ${u.depToWdMin < TH.fastWithdrawMin ? "✅ +2" : "—"}`);
+    lines.push(`• Rule2 ถอน > ฝาก + ExpLoss: ${u.withdraw > (u.deposit + r.expLoss) ? "✅ +2" : "—"}`);
+    lines.push(`• Rule3 %เกมเสี่ยง ≥ ${TH.highRtpPct}%: ${u.highRTPPct >= TH.highRtpPct ? "✅ +1" : "—"}`);
+    lines.push(`• Rule4 Turnover/ฝาก < ${TH.lowTurnoverRatio} และ ROI > ${(TH.roiHigh*100).toFixed(0)}%: ${(r.tRatio < TH.lowTurnoverRatio && r.roi > TH.roiHigh) ? "✅ +2" : "—"}`);
+
+    const flags = (r.flags.length ? r.flags.map(f=>`<span class="tag">${f}</span>`).join("") : `<span class="tag">ไม่มีธง</span>`);
+    $("rulesBox").innerHTML = `
+      <div class="mono" style="line-height:1.8;color:var(--muted)">
+        ${lines.join("<br>")}
+      </div>
+      <div style="margin-top:10px">${flags}</div>
+      <div class="note mono">
+        ExpLoss = turnover × lossRate = ${fmt(u.turnover)} × ${u.lossRate} = ${fmt(r.expLoss)}<br>
+        ROI = (ถอน-ฝาก)/ฝาก = ${fmt(r.net)}/${fmt(u.deposit)} = ${(isFinite(r.roi)? (r.roi*100).toFixed(1):0)}%
+      </div>
+    `;
+  }
+
+  // ===== Table render =====
+  function renderTable(){
+    const db = loadDB();
+    const arr = Object.values(db);
+
+    // Sort: score desc, then net desc
+    arr.sort((a,b)=>{
+      const rb = riskScore(b), ra = riskScore(a);
+      if(rb.score !== ra.score) return rb.score - ra.score;
+      return (rb.net - ra.net);
+    });
+
+    const tbody = $("tbody");
+    tbody.innerHTML = "";
+    for(const u of arr){
+      const r = riskScore(u);
+      const tr = document.createElement("tr");
+      tr.style.cursor = "pointer";
+      tr.innerHTML = `
+        <td>${u.userId}</td>
+        <td>${u.primaryType}</td>
+        <td class="right">${fmt(u.deposit)}</td>
+        <td class="right">${fmt(u.withdraw)}</td>
+        <td class="right">${fmt(u.turnover)}</td>
+        <td class="right">${fmt(r.expLoss)}</td>
+        <td class="right">${fmt(r.net)}</td>
+        <td class="right">${fmt(u.highRTPPct)}%</td>
+        <td class="right">${fmt(u.depToWdMin)}</td>
+        <td class="right"><b>${r.score}</b></td>
+        <td class="${r.level.includes("ปกติ")?"ok":r.level.includes("เฝ้าระวัง")?"warn":"bad"}">${r.level}</td>
+        <td>${r.flags.length ? r.flags.join(", ") : "-"}</td>
+      `;
+      tr.addEventListener("click", ()=>{
+        // Load into form
+        $("userId").value = u.userId;
+        $("depToWdMin").value = u.depToWdMin;
+        $("deposit").value = u.deposit;
+        $("withdraw").value = u.withdraw;
+        $("turnover").value = u.turnover;
+        $("lossRate").value = u.lossRate;
+        $("highRTPPct").value = u.highRTPPct;
+        $("primaryType").value = u.primaryType;
+        renderCurrent();
+        window.scrollTo({top:0, behavior:"smooth"});
+      });
+      tbody.appendChild(tr);
+    }
+  }
+
+  // ===== CSV import/export =====
+  function parseCSV(text){
+    // Very small CSV parser (handles simple comma-separated without quoted commas)
+    const lines = text.split(/\r?\n/).filter(l=>l.trim().length);
+    if(!lines.length) return [];
+    const headers = lines[0].split(",").map(s=>s.trim());
+    const rows = [];
+    for(let i=1;i<lines.length;i++){
+      const cols = lines[i].split(",").map(s=>s.trim());
+      const obj = {};
+      headers.forEach((h,idx)=> obj[h]= (cols[idx] ?? ""));
+      rows.push(obj);
+    }
+    return rows;
+  }
+
+  function coerceRow(o){
+    return {
+      userId: (o.userId || o.userid || o.user || "unknown").toString().trim(),
+      depToWdMin: parseFloat(o.depToWdMin ?? o.depToWd ?? o.dep_to_wd_min ?? "0") || 0,
+      deposit: parseFloat(o.deposit ?? o.dep ?? "0") || 0,
+      withdraw: parseFloat(o.withdraw ?? o.wd ?? "0") || 0,
+      turnover: parseFloat(o.turnover ?? o.wager ?? o.totalWager ?? "0") || 0,
+      lossRate: parseFloat(o.lossRate ?? o.margin ?? "0.08") || 0.08,
+      highRTPPct: parseFloat(o.highRTPPct ?? o.highRtpPct ?? "0") || 0,
+      primaryType: (o.primaryType || o.type || "สล็อต").toString().trim() || "สล็อต"
+    };
+  }
+
+  function exportResultCSV(){
+    const db = loadDB();
+    const arr = Object.values(db).map(u=>{
+      const r = riskScore(u);
+      return {
+        userId: u.userId,
+        primaryType: u.primaryType,
+        deposit: u.deposit,
+        withdraw: u.withdraw,
+        turnover: u.turnover,
+        depToWdMin: u.depToWdMin,
+        lossRate: u.lossRate,
+        highRTPPct: u.highRTPPct,
+        expLoss: r.expLoss,
+        net: r.net,
+        score: r.score,
+        level: r.level,
+        flags: r.flags.join("|")
+      };
+    });
+
+    const header = ["userId","primaryType","deposit","withdraw","turnover","depToWdMin","lossRate","highRTPPct","expLoss","net","score","level","flags"];
+    const lines = [header.join(",")];
+    for(const r of arr){
+      lines.push(header.map(k => `"${String(r[k]??"").replaceAll('"','""')}"`).join(","));
+    }
+    const blob = new Blob([lines.join("\n")], {type:"text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "user_risk_results.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function downloadSampleCSV(){
+    const sample = [
+      "userId,depToWdMin,deposit,withdraw,turnover,lossRate,highRTPPct,primaryType",
+      "ztip10123,20,1000,2500,4000,0.08,85,สล็อต",
+      "ztip20999,120,3000,2800,25000,0.08,10,สล็อต",
+      "sport777,15,2000,4000,3000,0.10,0,กีฬา",
+      "lotto111,60,1500,1700,2000,0.05,0,หวย"
+    ].join("\n");
+    const blob = new Blob([sample], {type:"text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sample_users.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ===== Actions =====
+  $("addBtn").addEventListener("click", ()=>{
+    const u = readCurrent();
+    if(!u.userId || u.userId==="unknown"){
+      alert("กรุณาใส่ User ID"); return;
+    }
+    const db = loadDB();
+    db[u.userId] = u;
+    saveDB(db);
+    renderCurrent();
+    renderTable();
+  });
+
+  $("exportBtn").addEventListener("click", exportResultCSV);
+
+  $("clearBtn").addEventListener("click", ()=>{
+    if(confirm("ล้างข้อมูลทั้งหมดในเครื่อง?")){
+      localStorage.removeItem(STORAGE_KEY);
+      renderTable();
+      renderCurrent();
+    }
+  });
+
+  $("downloadSampleBtn").addEventListener("click", downloadSampleCSV);
+
+  $("csvFile").addEventListener("change", async (e)=>{
+    const file = e.target.files?.[0];
+    if(!file) return;
+    const text = await file.text();
+    const rows = parseCSV(text);
+    const db = loadDB();
+    let added = 0;
+    for(const r of rows){
+      const u = coerceRow(r);
+      if(u.userId && u.userId!=="unknown"){
+        db[u.userId] = u;
+        added++;
+      }
+    }
+    saveDB(db);
+    renderTable();
+    renderCurrent();
+    alert(`นำเข้าแล้ว ${added} ยูส`);
+    e.target.value = "";
+  });
+
+  // Live compute
+  document.querySelectorAll("input,select").forEach(el=>{
+    el.addEventListener("input", renderCurrent);
+    el.addEventListener("change", renderCurrent);
+  });
+
+  // init
+  renderCurrent();
+  renderTable();
+</script>
 </body>
 </html>
